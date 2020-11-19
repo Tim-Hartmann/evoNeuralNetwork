@@ -46,19 +46,20 @@ func Binary(x float64) float64 {
 func Identity(x float64) float64 {
 	return x
 }
+func Square(x float64) float64 {
+	return math.Pow(f, 2)
+}
 
 var Activations = []func(float64) float64{
 	Sigmoid,
 	ReLU,
 	Binary,
 	Identity,
+	Square,
 	math.Sin,
 	math.Cos,
 	math.Ceil,
 	math.Floor,
-	func(f float64) float64 {
-		return math.Pow(f, 2)
-	},
 	math.Sqrt,
 	math.Log,
 }
