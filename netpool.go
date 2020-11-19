@@ -2,13 +2,13 @@ package neuralnet
 
 import (
 	"sort"
-	"sync"
 )
 
 var (
 	MaxRepop = 25
 	SurvivorCount = 5
 	NewSpawnCount = 5
+	ParallelValue = 8
 )
 
 type NetPool struct {
@@ -30,15 +30,13 @@ func (n *NetPool) Seed() {
 }
 
 func (n *NetPool) Forward(input []float64) { //Forward all networks in parallel, do not calculate error
-	var wg sync.WaitGroup
-	for i := 0; i < len(n.Networks); i++ {
-		wg.Add(1)
-		go func(i int) {
-			defer wg.Done()
-			n.Networks[i].Forward(input)
+	for i:=0; i < ParallelValue; i++ {
+		go func(i int){
+			for c := i; c < len(n.Networks); c+= ParallelValue {
+				n.Networks[c].Forward(input)
+			}
 		}(i)
 	}
-	wg.Wait()
 }
 
 func (n *NetPool) ResetErrors() {
