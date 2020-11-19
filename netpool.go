@@ -34,12 +34,12 @@ func (n *NetPool) Forward(input []float64) { //Forward all networks in parallel,
 	var wg sync.WaitGroup
 	for i:=0; i < ParallelValue; i++ {
 		wg.Add(1)
-		go func(i int){
+		go func(i int, input []float64){
 			defer wg.Done()
 			for c := i; c < len(n.Networks); c+= ParallelValue {
 				n.Networks[c].Forward(input)
 			}
-		}(i)
+		}(i, input)
 	}
 	wg.Wait()
 }
