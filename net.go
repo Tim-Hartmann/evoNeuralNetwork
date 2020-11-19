@@ -47,7 +47,7 @@ func Identity(x float64) float64 {
 	return x
 }
 func Square(x float64) float64 {
-	return math.Pow(f, 2)
+	return math.Pow(x, 2)
 }
 
 var Activations = []func(float64) float64{
