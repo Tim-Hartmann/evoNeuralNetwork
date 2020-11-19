@@ -76,14 +76,14 @@ func randomString(n int) string {
 	return string(b)
 }
 
-func randomActivation() func(float64) float64 {
-	return Activations[rand.Intn(len(Activations))]
+func randomActivation(rndSource *rand.Rand) func(float64) float64 {
+	return Activations[rndSource.Intn(len(Activations))]
 }
 
 func randomNode(nextLayerWidth int, rndSource *rand.Rand) Node {
 	n := Node{
 		acc:        0,
-		activation: randomActivation(),
+		activation: randomActivation(rndSource),
 		weights:    []float64{},
 	}
 	for i := 0; i < nextLayerWidth; i++ {
@@ -93,7 +93,7 @@ func randomNode(nextLayerWidth int, rndSource *rand.Rand) Node {
 }
 func (n Node) mutate(rndSource *rand.Rand) Node {
 	if rndSource.Intn(400) == 0 { // Replace activation function and reseed weights
-		n.activation = randomActivation()
+		n.activation = randomActivation(rndSource)
 		for i := 0; i < len(n.weights); i++ {
 			n.weights[i] = rndSource.Float64()*2.0 - 1
 		}
@@ -105,7 +105,7 @@ func (n Node) mutate(rndSource *rand.Rand) Node {
 	return n
 }
 func mutate(w *float64, rndSource *rand.Rand) {
-	if rand.Intn(3) == 0 {
+	if rndSource.Intn(3) == 0 {
 		*w += (rndSource.Float64() - 0.5) / 15.0
 	} else if rndSource.Intn(100) == 1 {
 		*w = rndSource.Float64()*2.0 - 1
