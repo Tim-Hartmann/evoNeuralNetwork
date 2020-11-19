@@ -9,7 +9,7 @@ var (
 	MaxRepop = 25
 	SurvivorCount = 5
 	NewSpawnCount = 5
-	ParallelValue = 8
+	ParallelValue = 1
 )
 
 type NetPool struct {
