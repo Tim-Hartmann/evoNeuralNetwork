@@ -24,9 +24,6 @@ type Node struct {
 }
 
 func ReLU(x float64) float64 {
-	var f func(float64) float64
-	f = Sigmoid
-	f(3)
 	if x < 0 {
 		return 0
 	} else {
@@ -58,8 +55,8 @@ var Activations = []func(float64) float64{
 	ReLU,
 	Binary,
 	Identity,
-	Square,
-	AbsRoot,
+	//Square,
+	//AbsRoot,
 	math.Sin,
 	math.Cos,
 	math.Ceil,
