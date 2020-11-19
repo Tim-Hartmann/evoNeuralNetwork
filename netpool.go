@@ -1,7 +1,9 @@
 package neuralnet
 
 import (
+	"math/rand"
 	"sort"
+	"time"
 )
 
 var (
@@ -23,8 +25,9 @@ func (n NetPool) Swap(i, j int) {
 }
 
 func (n *NetPool) Seed() {
+	rndSource := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
 	for i := 0; i < MaxRepop; i++ {
-		n.Networks = append(n.Networks, RandomNet(n.Structure))
+		n.Networks = append(n.Networks, RandomNet(n.Structure, rndSource))
 	}
 }
 
@@ -42,6 +45,8 @@ func (n *NetPool) ResetErrors() {
 }
 
 func (n *NetPool) EvolutionStep() { // Make sure to set error manually before calling this function
+	rndSource := rand.New(rand.NewSource(time.Now().UTC().UnixNano()))
+
 	sort.Slice(n.Networks, func(i, j int) bool {
 		return n.Networks[i].Error < n.Networks[j].Error
 	})
@@ -53,12 +58,12 @@ func (n *NetPool) EvolutionStep() { // Make sure to set error manually before ca
 
 	for i := SurvivorCount; i < MaxRepop; i++ {
 		net := n.Networks[i%SurvivorCount].Copy()
-		net.Mutate()
+		net.Mutate(rndSource)
 		newNet.Networks = append(newNet.Networks, net)
 	}
 
 	for i := 0; i < NewSpawnCount; i++ {
-		newNet.Networks = append(newNet.Networks, RandomNet(n.Structure))
+		newNet.Networks = append(newNet.Networks, RandomNet(n.Structure, rndSource))
 	}
 	n.Networks = newNet.Networks
 }

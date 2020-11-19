@@ -80,39 +80,39 @@ func randomActivation() func(float64) float64 {
 	return Activations[rand.Intn(len(Activations))]
 }
 
-func randomNode(nextLayerWidth int) Node {
+func randomNode(nextLayerWidth int, rndSource *rand.Rand) Node {
 	n := Node{
 		acc:        0,
 		activation: randomActivation(),
 		weights:    []float64{},
 	}
 	for i := 0; i < nextLayerWidth; i++ {
-		n.weights = append(n.weights, rand.Float64()*2.0-1.0)
+		n.weights = append(n.weights, rndSource.Float64()*2.0-1.0)
 	}
 	return n
 }
-func (n Node) mutate() Node {
-	if rand.Intn(400) == 0 { // Replace activation function and reseed weights
+func (n Node) mutate(rndSource *rand.Rand) Node {
+	if rndSource.Intn(400) == 0 { // Replace activation function and reseed weights
 		n.activation = randomActivation()
 		for i := 0; i < len(n.weights); i++ {
-			n.weights[i] = rand.Float64()*2.0 - 1
+			n.weights[i] = rndSource.Float64()*2.0 - 1
 		}
 	} else { // Mutate the weights randomly
 		for i := 0; i < len(n.weights); i++ {
-			mutate(&n.weights[i])
+			mutate(&n.weights[i], rndSource)
 		}
 	}
 	return n
 }
-func mutate(w *float64) {
+func mutate(w *float64, rndSource *rand.Rand) {
 	if rand.Intn(3) == 0 {
-		*w += (rand.Float64() - 0.5) / 15.0
-	} else if rand.Intn(100) == 1 {
-		*w = rand.Float64()*2.0 - 1
+		*w += (rndSource.Float64() - 0.5) / 15.0
+	} else if rndSource.Intn(100) == 1 {
+		*w = rndSource.Float64()*2.0 - 1
 	}
 }
 
-func RandomNet(layers []int) Net {
+func RandomNet(layers []int, rndSource *rand.Rand) Net {
 	n := Net{
 		ID:      randomString(10),
 		Species: randomString(5),
@@ -127,7 +127,7 @@ func RandomNet(layers []int) Net {
 	for l := 0; l < len(layers)-1; l++ {
 		var currentLayerNodes []Node
 		for n := 0; n < layers[l]; n++ {
-			currentLayerNodes = append(currentLayerNodes, randomNode(layers[l+1]))
+			currentLayerNodes = append(currentLayerNodes, randomNode(layers[l+1], rndSource))
 		}
 		n.Nodes = append(n.Nodes, currentLayerNodes)
 	}
@@ -174,12 +174,12 @@ func (net *Net) Forward(input []float64) {
 	}
 }
 
-func (net *Net) Mutate() {
+func (net *Net) Mutate(rndSource *rand.Rand) {
 	net.ID = randomString(10)
 	net.Error = 0.0
 	for i := 0; i < len(net.Nodes); i++ {
 		for j := 0; j < len(net.Nodes[i]); j++ {
-			net.Nodes[i][j].mutate()
+			net.Nodes[i][j].mutate(rndSource)
 		}
 	}
 }
