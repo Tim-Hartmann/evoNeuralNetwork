@@ -49,6 +49,9 @@ func Identity(x float64) float64 {
 func Square(x float64) float64 {
 	return math.Pow(x, 2)
 }
+func AbsRoot(x float64) float64 {
+	return math.Sqrt(math.Abs(x))
+}
 
 var Activations = []func(float64) float64{
 	Sigmoid,
@@ -56,12 +59,11 @@ var Activations = []func(float64) float64{
 	Binary,
 	Identity,
 	Square,
+	AbsRoot,
 	math.Sin,
 	math.Cos,
 	math.Ceil,
 	math.Floor,
-	math.Sqrt,
-	math.Log,
 }
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
