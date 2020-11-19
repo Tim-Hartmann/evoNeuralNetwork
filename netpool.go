@@ -25,7 +25,7 @@ func (n NetPool) Swap(i, j int) {
 
 func (n *NetPool) Seed() {
 	for i := 0; i < MaxRepop; i++ {
-		n.Networks = append(n.Networks, randomNet(n.Structure))
+		n.Networks = append(n.Networks, RandomNet(n.Structure))
 	}
 }
 
@@ -35,7 +35,7 @@ func (n *NetPool) Forward(input []float64) { //Forward all networks in parallel,
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			n.Networks[i].forward(input)
+			n.Networks[i].Forward(input)
 		}(i)
 	}
 	wg.Wait()
@@ -59,11 +59,11 @@ func (n *NetPool) EvolutionStep() { // Make sure to set error manually before ca
 	}
 	for i := SurvivorCount; i < MaxRepop; i++ {
 		net := n.Networks[i%SurvivorCount].Copy()
-		net.mutate()
+		net.Mutate()
 		newNet.Networks = append(newNet.Networks, net)
 	}
 	for i := 0; i < NewSpawnCount; i++ {
-		newNet.Networks = append(newNet.Networks, randomNet(n.Structure))
+		newNet.Networks = append(newNet.Networks, RandomNet(n.Structure))
 	}
 	n.Networks = newNet.Networks
 }

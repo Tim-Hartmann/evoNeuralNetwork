@@ -109,7 +109,7 @@ func mutate(w *float64) {
 	}
 }
 
-func randomNet(layers []int) Net {
+func RandomNet(layers []int) Net {
 	n := Net{
 		ID:      randomString(10),
 		Species: randomString(5),
@@ -132,7 +132,7 @@ func randomNet(layers []int) Net {
 	return n
 }
 
-func (net *Net) forward(input []float64) {
+func (net *Net) Forward(input []float64) {
 	if len(input) != len(net.Nodes[0]) {
 		log.Fatal("Input data must match length of first layer of network")
 	}
@@ -171,7 +171,7 @@ func (net *Net) forward(input []float64) {
 	}
 }
 
-func (net *Net) mutate() {
+func (net *Net) Mutate() {
 	net.ID = randomString(10)
 	net.Error = 0.0
 	for i := 0; i < len(net.Nodes); i++ {
@@ -217,7 +217,7 @@ func getNameOfFunction(i interface{}) string {
 	return runtime.FuncForPC(reflect.ValueOf(i).Pointer()).Name()
 }
 
-func prettyPrintNet(net [][]Node) {
+func PrettyPrintNet(net [][]Node) {
 	type textNode struct {
 		Weights    []float64
 		Activation string
@@ -239,7 +239,7 @@ func prettyPrintNet(net [][]Node) {
 	println(string(v))
 }
 
-func checkNetworkError(error *float64) {
+func CheckNetworkError(error *float64) {
 	if math.IsNaN(*error) {
 		*error = math.Inf(1)
 	}
