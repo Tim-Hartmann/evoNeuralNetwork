@@ -58,13 +58,26 @@ func (n *NetPool) EvolutionStep() { // Make sure to set error manually before ca
 	newNet := NetPool{}
 	for i := 0; i < SurvivorCount; i++ {
 		newNet.Networks = append(newNet.Networks, n.Networks[i].Copy())
+	}
 
+	var wg sync.WaitGroup
+	var networksLock sync.Mutex
+	wg.Add(MaxRepop-SurvivorCount)
+	for w := 0; w < ParallelValue; w++ {
+		for i := SurvivorCount+w; i < MaxRepop; i+=ParallelValue {
+			go func(i int) {
+				defer wg.Done()
+				net := n.Networks[i%SurvivorCount].Copy()
+				net.Mutate()
+				networksLock.Lock()
+				newNet.Networks = append(newNet.Networks, net)
+				networksLock.Unlock()
+			}(i)
+		}
 	}
-	for i := SurvivorCount; i < MaxRepop; i++ {
-		net := n.Networks[i%SurvivorCount].Copy()
-		net.Mutate()
-		newNet.Networks = append(newNet.Networks, net)
-	}
+	wg.Wait()
+
+
 	for i := 0; i < NewSpawnCount; i++ {
 		newNet.Networks = append(newNet.Networks, RandomNet(n.Structure))
 	}
