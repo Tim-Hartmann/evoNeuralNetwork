@@ -2,14 +2,12 @@ package neuralnet
 
 import (
 	"sort"
-	"sync"
 )
 
 var (
 	MaxRepop = 25
 	SurvivorCount = 5
 	NewSpawnCount = 5
-	ParallelValue = 1
 )
 
 type NetPool struct {
@@ -31,18 +29,11 @@ func (n *NetPool) Seed() {
 }
 
 func (n *NetPool) Forward(input []float64) { //Forward all networks in parallel, do not calculate error
-	var wg sync.WaitGroup
-	wg.Add(ParallelValue)
-	for i:=0; i < ParallelValue; i++ {
-		go func(i int, input []float64){
-			defer wg.Done()
-			for c := i; c < len(n.Networks); c+= ParallelValue {
-				n.Networks[c].Forward(input)
-			}
-		}(i, input)
+	for c := 0; c < len(n.Networks); c++ {
+		n.Networks[c].Forward(input)
 	}
-	wg.Wait()
 }
+
 
 func (n *NetPool) ResetErrors() {
 	for i := 0; i < len(n.Networks); i++ {
@@ -60,23 +51,11 @@ func (n *NetPool) EvolutionStep() { // Make sure to set error manually before ca
 		newNet.Networks = append(newNet.Networks, n.Networks[i].Copy())
 	}
 
-	var wg sync.WaitGroup
-	var networksLock sync.Mutex
-	wg.Add(MaxRepop-SurvivorCount)
-	for w := 0; w < ParallelValue; w++ {
-		for i := SurvivorCount+w; i < MaxRepop; i+=ParallelValue {
-			go func(i int) {
-				defer wg.Done()
-				net := n.Networks[i%SurvivorCount].Copy()
-				net.Mutate()
-				networksLock.Lock()
-				newNet.Networks = append(newNet.Networks, net)
-				networksLock.Unlock()
-			}(i)
-		}
+	for i := SurvivorCount; i < MaxRepop; i++ {
+		net := n.Networks[i%SurvivorCount].Copy()
+		net.Mutate()
+		newNet.Networks = append(newNet.Networks, net)
 	}
-	wg.Wait()
-
 
 	for i := 0; i < NewSpawnCount; i++ {
 		newNet.Networks = append(newNet.Networks, RandomNet(n.Structure))
